@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.master.protos";
+//option java_outer_classname = "StreamProto";
+
+package stream;
+
+service Replication {
+  // Methods required for Gateway
+  rpc NewNodeUpdate(NewNodeUpdateRequest) returns (StatusResponse) {}
+  rpc GetNodeForDownload(GetNodeForDownloadRequest) returns (GetNodeForDownloadResponse) {}
+  rpc GetNodeForUpload(GetNodeForUploadRequest) returns (GetNodeForUploadResponse) {}
+}
+
+enum Status {
+  SUCCESS = 0;
+  FAILURE = 1;
+}
+
+// The request message containing the IP address of the new Node that joined the network
+message NewNodeUpdateRequest {
+  string newnodeip = 1;
+}
+
+// The response message containing the generic status of an incoming request
+message StatusResponse {
+  Status status = 1;
+}
+
+message GetNodeForDownloadRequest {
+  string filename = 1;
+}
+
+message GetNodeForDownloadResponse {
+  string nodeip = 1;
+}
+
+message GetNodeForUploadRequest {
+  string filename = 1;
+  int64 filesize = 2; // in bytes
+}
+
+message GetNodeForUploadResponse {
+  string nodeip = 1;
+}
