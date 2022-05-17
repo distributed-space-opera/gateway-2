@@ -1,4 +1,4 @@
-package grpc.comm.controllers;
+package grpc.authentication.controllers;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;

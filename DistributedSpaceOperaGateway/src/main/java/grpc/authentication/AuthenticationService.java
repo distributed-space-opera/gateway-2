@@ -1,5 +1,6 @@
 package grpc.authentication;
 
+import grpc.authentication.controllers.MasterComm;
 import grpc.db.ClientDetails;
 import grpc.db.Connector;
 import grpc.db.NodeDetails;
@@ -88,5 +89,15 @@ public class AuthenticationService extends AuthenticateGrpc.AuthenticateImplBase
 
         responseObserver.onNext(loginReply.build());
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getNodeForUpload(UploadRequest request, StreamObserver<UploadResponse> responseObserver) {
+        MasterComm.getNodeForUpload(request, responseObserver);
+    }
+
+    @Override
+    public void getNodeForDownload(DownloadRequest request, StreamObserver<DownloadResponse> responseObserver) {
+        MasterComm.getNodeForDownload(request, responseObserver);
     }
 }

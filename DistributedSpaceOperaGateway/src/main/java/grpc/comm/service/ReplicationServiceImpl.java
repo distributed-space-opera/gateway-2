@@ -1,6 +1,5 @@
 package grpc.comm.service;
 
-import grpc.comm.controllers.MasterComm;
 import grpc.comm.controllers.NodeComm;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
