@@ -80,16 +80,4 @@ public class ReplicationServiceImpl extends ReplicationGrpc.ReplicationImplBase 
     public void newNodeUpdate(NewNodeUpdateRequest request, StreamObserver<StatusResponse> responseObserver) {
         NodeComm.newNodeUpdate(request, responseObserver);
     }
-
-    @Override
-    public void getNodeForDownload(GetNodeForDownloadRequest request,
-                                   StreamObserver<GetNodeForDownloadResponse> responseObserver) {
-        MasterComm.getNodeForDownload(request, responseObserver);
-    }
-
-    @Override
-    public void getNodeForUpload(GetNodeForUploadRequest request,
-                                 StreamObserver<GetNodeForUploadResponse> responseObserver) {
-        MasterComm.getNodeForUpload(request, responseObserver);
-    }
 }

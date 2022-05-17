@@ -1,4 +1,4 @@
-package grpc.comm.db;
+package grpc.db;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

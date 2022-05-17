@@ -1,13 +1,11 @@
 package grpc.authentication;
 
-import grpc.comm.db.ClientDetails;
-import grpc.comm.db.Connector;
-import grpc.comm.db.NodeDetails;
+import grpc.db.ClientDetails;
+import grpc.db.Connector;
+import grpc.db.NodeDetails;
 import grpc.jwt.JwtHelper;
 import io.grpc.stub.StreamObserver;
 import org.gateway.protos.*;
-
-import java.sql.SQLException;
 
 public class AuthenticationService extends AuthenticateGrpc.AuthenticateImplBase {
     private enum TYPES {CLIENT, NODE};

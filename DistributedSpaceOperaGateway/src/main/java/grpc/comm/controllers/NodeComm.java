@@ -1,14 +1,10 @@
 package grpc.comm.controllers;
 
-import grpc.comm.db.Connector;
-import grpc.comm.db.NodeDetails;
+import grpc.db.NodeDetails;
 import io.grpc.stub.StreamObserver;
 import org.master.protos.NewNodeUpdateRequest;
 import org.master.protos.Status;
 import org.master.protos.StatusResponse;
-
-import java.sql.Connection;
-import java.sql.SQLException;
 
 public class NodeComm {
 
@@ -19,15 +15,10 @@ public class NodeComm {
 
         StatusResponse.Builder response = StatusResponse.newBuilder();
 
-        try {
-            if (NodeDetails.checkIfNew(nodeIP)) {
-                NodeDetails.addNewNode(nodeIP, password);
-                response.setStatus(Status.FAILURE);
-            } else {
-                response.setStatus(Status.FAILURE);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (NodeDetails.checkIfNew(nodeIP)) {
+            NodeDetails.addNewNode(nodeIP, password);
+            response.setStatus(Status.FAILURE);
+        } else {
             response.setStatus(Status.FAILURE);
         }
         responseObserver.onNext(response.build());
