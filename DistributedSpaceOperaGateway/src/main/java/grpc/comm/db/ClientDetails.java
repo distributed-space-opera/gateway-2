@@ -1,12 +1,14 @@
 package grpc.comm.db;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class NodeDetails {
-
-    public static Connector.QueryStatus addNewNode(String ip, String password) {
+public class ClientDetails {
+    public static Connector.QueryStatus addNewClient(String ip, String password) {
         try {
-            String query = "INSERT INTO node_details (ip, password) VALUES (?, ?)";
+            String query = "INSERT INTO client_details (ip, password) VALUES (?, ?)";
             Connection conn = Connector.getConnection();
             PreparedStatement statement = conn.prepareStatement(query);
             statement.setString(1, ip);
@@ -19,25 +21,9 @@ public class NodeDetails {
         return Connector.QueryStatus.FAILURE;
     }
 
-    public static boolean checkIfNew(String ip) {
+    public static boolean validateClient(String ip, String password) {
         try {
-            String query = "Select ip FROM node_details WHERE ip = ?";
-            Connection conn = Connector.getConnection();
-            PreparedStatement statement = conn.prepareStatement(query);
-            statement.setString(1, ip);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet == null) return true;
-            resultSet.last();
-            if (resultSet.getRow() == 0) return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public static boolean validateNode(String ip, String password) {
-        try {
-            String query = "Select ip FROM node_details WHERE ip = ? and password = ?";
+            String query = "Select ip FROM client_details WHERE ip = ? and password = ?";
             Connection conn = Connector.getConnection();
             PreparedStatement statement = conn.prepareStatement(query);
             statement.setString(1, ip);
@@ -50,5 +36,4 @@ public class NodeDetails {
             return false;
         }
     }
-
 }
