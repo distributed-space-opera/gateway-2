@@ -45,10 +45,14 @@ public class JwtHelper {
         }
     }
 
-    public boolean verifyToken(String clientToken) {
+    public boolean verifyToken(String clientIp, String clientToken) {
         try {
             JWTVerifier verifier = JWT.require(algorithm).withIssuer(issuer).build();
             DecodedJWT jwt = verifier.verify(clientToken);
+
+            if (!clientIp.equals(jwt.getClaim("ip"))) {
+                return false;
+            }
 
             return true;
         } catch (JWTVerificationException e) {

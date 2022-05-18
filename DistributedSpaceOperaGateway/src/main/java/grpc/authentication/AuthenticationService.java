@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 public class AuthenticationService extends AuthenticateGrpc.AuthenticateImplBase {
     private enum TYPES {CLIENT, NODE};
@@ -96,6 +97,19 @@ public class AuthenticationService extends AuthenticateGrpc.AuthenticateImplBase
 
         Connector.QueryStatus status = Connector.QueryStatus.FAILURE;
 
+        Reply.Builder registerReply = Reply.newBuilder();
+        registerReply.setMessage("");
+        registerReply.setMasterip("");
+        registerReply.setToken("");
+
+        if(!isIpValid(clientIp)) {
+            registerReply.setMessage("Invalid ip address. Please enter IPV4 address");
+            responseObserver.onNext(registerReply.build());
+            responseObserver.onCompleted();
+
+            return;
+        }
+
         if (type.equalsIgnoreCase(TYPES.CLIENT.toString())) {
            status = ClientDetails.addNewClient(clientIp, password);
         }
@@ -104,10 +118,6 @@ public class AuthenticationService extends AuthenticateGrpc.AuthenticateImplBase
             status = NodeDetails.addNewNode(clientIp, password);
         }
 
-        Reply.Builder registerReply = Reply.newBuilder();
-        registerReply.setMessage("");
-        registerReply.setMasterip("");
-        registerReply.setToken("");
 
         Status response = Status.SUCCESS;
         if (type.equalsIgnoreCase(TYPES.NODE.toString())) {
@@ -137,7 +147,19 @@ public class AuthenticationService extends AuthenticateGrpc.AuthenticateImplBase
         String type = request.getType();
 
         Reply.Builder loginReply = Reply.newBuilder();
+        loginReply.setMessage("");
+        loginReply.setToken("");
+        loginReply.setMasterip("");
+
         boolean isValid = false;
+
+        if(!isIpValid(clientIp)) {
+            loginReply.setMessage("Invalid ip address. Please enter IPV4 address");
+            responseObserver.onNext(loginReply.build());
+            responseObserver.onCompleted();
+
+            return;
+        }
 
         if (type.equalsIgnoreCase(TYPES.CLIENT.toString())) {
             isValid = ClientDetails.validateClient(clientIp, password);
@@ -146,10 +168,6 @@ public class AuthenticationService extends AuthenticateGrpc.AuthenticateImplBase
         if (type.equalsIgnoreCase(TYPES.NODE.toString())) {
             isValid = NodeDetails.validateNode(clientIp, password);
         }
-
-        loginReply.setMessage("");
-        loginReply.setToken("");
-        loginReply.setMasterip("");
 
         if(!isValid) {
             loginReply.setMessage(type + " is not registered");
@@ -178,5 +196,10 @@ public class AuthenticationService extends AuthenticateGrpc.AuthenticateImplBase
     @Override
     public void getNodeForDownload(DownloadRequest request, StreamObserver<DownloadResponse> responseObserver) {
         MasterComm.getNodeForDownload(request, responseObserver);
+    }
+
+    private boolean isIpValid(String ip) {
+        String ipRegex = "^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$";
+        return Pattern.matches(ipRegex, ip);
     }
 }
