@@ -1,7 +1,5 @@
 package org.gateway.protos;
 
-import java.sql.SQLException;
-
 import static io.grpc.MethodDescriptor.generateFullMethodName;
 
 /**
@@ -195,14 +193,14 @@ public final class AuthenticateGrpc {
      * </pre>
      */
     public void register(org.gateway.protos.Request request,
-        io.grpc.stub.StreamObserver<org.gateway.protos.Reply> responseObserver) throws SQLException {
+        io.grpc.stub.StreamObserver<org.gateway.protos.Reply> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getRegisterMethod(), responseObserver);
     }
 
     /**
      */
     public void login(org.gateway.protos.Request request,
-        io.grpc.stub.StreamObserver<org.gateway.protos.Reply> responseObserver) throws SQLException {
+        io.grpc.stub.StreamObserver<org.gateway.protos.Reply> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getLoginMethod(), responseObserver);
     }
 

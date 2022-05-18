@@ -90,7 +90,7 @@ public class AuthenticationService extends AuthenticateGrpc.AuthenticateImplBase
     }
 
     @Override
-    public void register(Request request, StreamObserver<Reply> responseObserver) throws SQLException {
+    public void register(Request request, StreamObserver<Reply> responseObserver) {
         String clientIp = request.getIp();
         String password = request.getPassword();
         String type = request.getType();
@@ -126,22 +126,34 @@ public class AuthenticationService extends AuthenticateGrpc.AuthenticateImplBase
 
         if(status == Connector.QueryStatus.FAILURE || response == Status.FAILURE) {
             registerReply.setMessage(type + " was not registered");
-            Connector.getConnection().rollback();
+            try {
+                Connector.getConnection().rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             responseObserver.onNext(registerReply.build());
             responseObserver.onCompleted();
 
             return;
         }
 
-        Connector.getConnection().commit();
-        registerReply.setMessage(type + " registered successfully");
+        try {
+            Connector.getConnection().commit();
+            registerReply.setMessage(type + " registered successfully");
 
-        responseObserver.onNext(registerReply.build());
-        responseObserver.onCompleted();
+            responseObserver.onNext(registerReply.build());
+            responseObserver.onCompleted();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            registerReply.setMessage(type + " was not registered");
+
+            responseObserver.onNext(registerReply.build());
+            responseObserver.onCompleted();
+        }
     }
 
     @Override
-    public void login(Request request, StreamObserver<Reply> responseObserver) throws SQLException {
+    public void login(Request request, StreamObserver<Reply> responseObserver) {
         String clientIp = request.getIp();
         String password = request.getPassword();
         String type = request.getType();
@@ -172,20 +184,31 @@ public class AuthenticationService extends AuthenticateGrpc.AuthenticateImplBase
         if(!isValid) {
             loginReply.setMessage(type + " is not registered");
 
-            Connector.getConnection().rollback();
+            try {
+                Connector.getConnection().rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             responseObserver.onNext(loginReply.build());
             responseObserver.onCompleted();
 
             return;
         }
+        try {
+            Connector.getConnection().commit();
+            loginReply.setMessage(type + " logged in successfully");
+            loginReply.setToken(jwtHelper.getToken(clientIp, type));
+            loginReply.setMasterip("");
 
-        Connector.getConnection().commit();
-        loginReply.setMessage(type + " logged in successfully");
-        loginReply.setToken(jwtHelper.getToken(clientIp, type));
-        loginReply.setMasterip("");
+            responseObserver.onNext(loginReply.build());
+            responseObserver.onCompleted();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            loginReply.setMessage(type + " is not registered");
 
-        responseObserver.onNext(loginReply.build());
-        responseObserver.onCompleted();
+            responseObserver.onNext(loginReply.build());
+            responseObserver.onCompleted();
+        }
     }
 
     @Override
