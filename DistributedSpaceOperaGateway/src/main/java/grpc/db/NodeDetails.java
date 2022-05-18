@@ -27,7 +27,10 @@ public class NodeDetails {
         try {
             String query = "Select ip FROM node_details WHERE ip = ?";
             Connection conn = Connector.getConnection();
-            PreparedStatement statement = conn.prepareStatement(query);
+            PreparedStatement statement = conn.prepareStatement(query,
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE
+            );
             statement.setString(1, ip);
             ResultSet resultSet = statement.executeQuery();
             statement.close();
@@ -50,7 +53,10 @@ public class NodeDetails {
         try {
             String query = "Select ip FROM node_details WHERE ip = ? and password = ?";
             Connection conn = Connector.getConnection();
-            PreparedStatement statement = conn.prepareStatement(query);
+            PreparedStatement statement = conn.prepareStatement(query,
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE
+            );
             statement.setString(1, ip);
             statement.setString(2, password);
             ResultSet resultSet = statement.executeQuery();
@@ -58,12 +64,16 @@ public class NodeDetails {
                 statement.close();
                 return false;
             }
+            resultSet.last();
+            if (resultSet.getRow() == 1) {
+                statement.close();
+                return true;
+            }
             statement.close();
-            return true;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
 }

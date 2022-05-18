@@ -180,7 +180,7 @@ public class AuthenticationService extends AuthenticateGrpc.AuthenticateImplBase
         if (type.equalsIgnoreCase(TYPES.NODE.toString())) {
             isValid = NodeDetails.validateNode(clientIp, password);
         }
-
+        System.out.println(isValid);
         if(!isValid) {
             loginReply.setMessage(type + " is not registered");
 

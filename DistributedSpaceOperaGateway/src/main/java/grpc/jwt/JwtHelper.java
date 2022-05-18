@@ -10,8 +10,11 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +29,7 @@ public class JwtHelper {
 
     public String getToken(String clientIp, String type) {
         try {
-            LocalDate localDate = LocalDate.now().plus(1, ChronoUnit.HOURS);
+            LocalDateTime localDateTime = LocalDateTime.now().plusHours(1);
 
             Map<String, Object> payloadClaims = new HashMap<>();
             payloadClaims.put("ip", clientIp);
@@ -36,7 +39,7 @@ public class JwtHelper {
 
             tokenBuilder.withPayload(payloadClaims);
             tokenBuilder.withIssuer(issuer);
-            tokenBuilder.withExpiresAt(Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            tokenBuilder.withExpiresAt(Date.from(localDateTime.toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
             return tokenBuilder.sign(algorithm);
         } catch (JWTCreationException e) {

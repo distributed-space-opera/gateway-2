@@ -17,6 +17,7 @@ public class Connector {
                             "/sys"
             );
         }
+        connection.setAutoCommit(false);
         return connection;
     }
 }
