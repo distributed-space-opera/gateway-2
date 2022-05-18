@@ -35,6 +35,7 @@ public class ClientDetails {
             );
             statement.setString(1, ip);
             statement.setString(2, password);
+            System.out.println(statement.toString());
             ResultSet resultSet = statement.executeQuery();
             if (resultSet == null) {
                 statement.close();
@@ -42,6 +43,7 @@ public class ClientDetails {
             }
 
             resultSet.last();
+            System.out.println(resultSet.getRow());
             if (resultSet.getRow() == 1) {
                 statement.close();
                 return true;

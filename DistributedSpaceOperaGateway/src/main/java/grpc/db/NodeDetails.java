@@ -11,6 +11,7 @@ public class NodeDetails {
             PreparedStatement statement = conn.prepareStatement(query);
             statement.setString(1, ip);
             statement.setString(2, password);
+
             int rowsAffected = statement.executeUpdate();
             if (rowsAffected == 1) {
                 statement.close();
