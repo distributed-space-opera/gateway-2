@@ -14,7 +14,11 @@ public class ClientDetails {
             statement.setString(1, ip);
             statement.setString(2, password);
             int rowsAffected = statement.executeUpdate();
-            if (rowsAffected == 1) return Connector.QueryStatus.SUCCESS;
+            if (rowsAffected == 1) {
+                statement.close();
+                return Connector.QueryStatus.SUCCESS;
+            }
+            statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -29,7 +33,11 @@ public class ClientDetails {
             statement.setString(1, ip);
             statement.setString(2, password);
             ResultSet resultSet = statement.executeQuery();
-            if (resultSet == null) return false;
+            if (resultSet == null) {
+                statement.close();
+                return false;
+            }
+            statement.close();
             return true;
         } catch (SQLException e) {
             e.printStackTrace();

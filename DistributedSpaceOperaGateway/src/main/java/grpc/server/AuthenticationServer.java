@@ -1,4 +1,4 @@
-package grpc.comm.service;
+package grpc.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,25 +6,25 @@ import org.slf4j.LoggerFactory;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ReplicationServer {
+public class AuthenticationServer {
 
     protected static Logger logger = LoggerFactory.getLogger("request-server");
-    protected static AtomicReference<ReplicationServer> instance = new AtomicReference<ReplicationServer>();
+    protected static AtomicReference<AuthenticationServer> instance = new AtomicReference<AuthenticationServer>();
     protected static Properties conf;
     protected Long serverID;
     protected Integer serverPort;
     protected Long nextMessageID;
 
-    private ReplicationServer() {
+    private AuthenticationServer() {
         init();
     };
 
     public static void configure(Properties conf) {
-        ReplicationServer.conf = conf;
+        AuthenticationServer.conf = conf;
     }
 
-    public static ReplicationServer getInstance() {
-        instance.compareAndSet(null, new ReplicationServer());
+    public static AuthenticationServer getInstance() {
+        instance.compareAndSet(null, new AuthenticationServer());
         return instance.get();
     }
 

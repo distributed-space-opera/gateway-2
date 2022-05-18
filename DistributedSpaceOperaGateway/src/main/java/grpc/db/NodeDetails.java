@@ -12,7 +12,11 @@ public class NodeDetails {
             statement.setString(1, ip);
             statement.setString(2, password);
             int rowsAffected = statement.executeUpdate();
-            if (rowsAffected == 1) return Connector.QueryStatus.SUCCESS;
+            if (rowsAffected == 1) {
+                statement.close();
+                return Connector.QueryStatus.SUCCESS;
+            }
+            statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -26,9 +30,16 @@ public class NodeDetails {
             PreparedStatement statement = conn.prepareStatement(query);
             statement.setString(1, ip);
             ResultSet resultSet = statement.executeQuery();
-            if (resultSet == null) return true;
+            statement.close();
+            if (resultSet == null) {
+                statement.close();
+                return true;
+            }
             resultSet.last();
-            if (resultSet.getRow() == 0) return true;
+            if (resultSet.getRow() == 0) {
+                statement.close();
+                return true;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -43,7 +54,11 @@ public class NodeDetails {
             statement.setString(1, ip);
             statement.setString(2, password);
             ResultSet resultSet = statement.executeQuery();
-            if (resultSet == null) return false;
+            if (resultSet == null) {
+                statement.close();
+                return false;
+            }
+            statement.close();
             return true;
         } catch (SQLException e) {
             e.printStackTrace();

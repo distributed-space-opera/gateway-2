@@ -59,4 +59,22 @@ public class MasterComm {
 
     }
 
+    public static Status notifyMaster(String nodeIP) {
+
+        String masterIP = "";
+        int port = 3000;
+
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(masterIP, port).usePlaintext().build();
+        ReplicationGrpc.ReplicationBlockingStub stub = ReplicationGrpc.newBlockingStub(channel);
+
+        NewNodeUpdateRequest.Builder builder = NewNodeUpdateRequest.newBuilder();
+
+        builder.setNewnodeip(nodeIP);
+
+        StatusResponse response = stub.newNodeUpdate(builder.build());
+
+        return response.getStatus();
+
+    }
+
 }
