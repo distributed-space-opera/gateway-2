@@ -13,6 +13,8 @@ public class AuthenticationServer {
     protected static Properties conf;
     protected Long serverID;
     protected Integer serverPort;
+    protected String masterIP;
+    protected Integer masterPort;
     protected Long nextMessageID;
 
     private AuthenticationServer() {
@@ -47,6 +49,16 @@ public class AuthenticationServer {
         if (serverPort <= 1024)
             throw new RuntimeException("server port must be above 1024");
 
+        tmp = conf.getProperty("master.ip");
+        if (tmp == null)
+            throw new RuntimeException("missing master ip");
+        masterIP = tmp;
+
+        tmp = conf.getProperty("master.port");
+        if (tmp == null)
+            throw new RuntimeException("missing master port");
+        masterPort = Integer.parseInt(tmp);
+
         nextMessageID = 0L;
     }
 
@@ -66,4 +78,11 @@ public class AuthenticationServer {
         return serverPort;
     }
 
+    public String getMasterIP() {
+        return masterIP;
+    }
+
+    public Integer getMasterPort() {
+        return masterPort;
+    }
 }

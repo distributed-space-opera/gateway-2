@@ -121,11 +121,11 @@ public class AuthenticationService extends AuthenticateGrpc.AuthenticateImplBase
 
         Status response = Status.SUCCESS;
         if (type.equalsIgnoreCase(TYPES.NODE.toString())) {
-            response = MasterComm.notifyMaster(clientIp);
+            response = MasterComm.notifyMaster(clientIp, AuthenticationServer.getInstance().getMasterIP(), AuthenticationServer.getInstance().getMasterPort());
         }
 
         if(status == Connector.QueryStatus.FAILURE || response == Status.FAILURE) {
-            registerReply.setMessage(type + " was not registered");
+            registerReply.setMessage("ERROR");
             try {
                 Connector.getConnection().rollback();
             } catch (SQLException e) {
@@ -139,13 +139,14 @@ public class AuthenticationService extends AuthenticateGrpc.AuthenticateImplBase
 
         try {
             Connector.getConnection().commit();
-            registerReply.setMessage(type + " registered successfully");
-
+            registerReply.setMessage("SUCCESS");
+            registerReply.setToken(jwtHelper.getToken(clientIp, password));
+            registerReply.setMasterip(AuthenticationServer.getInstance().getMasterIP());
             responseObserver.onNext(registerReply.build());
             responseObserver.onCompleted();
         } catch (SQLException e) {
             e.printStackTrace();
-            registerReply.setMessage(type + " was not registered");
+            registerReply.setMessage("ERROR");
 
             responseObserver.onNext(registerReply.build());
             responseObserver.onCompleted();
@@ -175,14 +176,16 @@ public class AuthenticationService extends AuthenticateGrpc.AuthenticateImplBase
 
         if (type.equalsIgnoreCase(TYPES.CLIENT.toString())) {
             isValid = ClientDetails.validateClient(clientIp, password);
+            System.out.println(isValid);
         }
 
         if (type.equalsIgnoreCase(TYPES.NODE.toString())) {
             isValid = NodeDetails.validateNode(clientIp, password);
+            System.out.println(isValid);
         }
-        System.out.println(isValid);
+
         if(!isValid) {
-            loginReply.setMessage(type + " is not registered");
+            loginReply.setMessage("ERROR");
 
             try {
                 Connector.getConnection().rollback();
@@ -196,15 +199,15 @@ public class AuthenticationService extends AuthenticateGrpc.AuthenticateImplBase
         }
         try {
             Connector.getConnection().commit();
-            loginReply.setMessage(type + " logged in successfully");
+            loginReply.setMessage("SUCCESS");
             loginReply.setToken(jwtHelper.getToken(clientIp, type));
-            loginReply.setMasterip("");
+            loginReply.setMasterip(AuthenticationServer.getInstance().getMasterIP());
 
             responseObserver.onNext(loginReply.build());
             responseObserver.onCompleted();
         } catch (SQLException e) {
             e.printStackTrace();
-            loginReply.setMessage(type + " is not registered");
+            loginReply.setMessage("ERROR");
 
             responseObserver.onNext(loginReply.build());
             responseObserver.onCompleted();
@@ -213,12 +216,12 @@ public class AuthenticationService extends AuthenticateGrpc.AuthenticateImplBase
 
     @Override
     public void getNodeForUpload(UploadRequest request, StreamObserver<UploadResponse> responseObserver) {
-        MasterComm.getNodeForUpload(request, responseObserver);
+        MasterComm.getNodeForUpload(request, responseObserver, AuthenticationServer.getInstance().getMasterIP(), AuthenticationServer.getInstance().getMasterPort());
     }
 
     @Override
     public void getNodeForDownload(DownloadRequest request, StreamObserver<DownloadResponse> responseObserver) {
-        MasterComm.getNodeForDownload(request, responseObserver);
+        MasterComm.getNodeForDownload(request, responseObserver, AuthenticationServer.getInstance().getMasterIP(), AuthenticationServer.getInstance().getMasterPort());
     }
 
     private boolean isIpValid(String ip) {

@@ -10,21 +10,23 @@ import org.gateway.protos.UploadResponse;
 import org.master.protos.*;
 
 public class MasterComm {
-
     public static void getNodeForDownload(DownloadRequest request,
-                                          StreamObserver<DownloadResponse> responseObserver) {
-
-        String masterIP = "";
-        int port = 3000;
+                                          StreamObserver<DownloadResponse> responseObserver, String masterIP, int port) {
+        System.out.println("---------In Node DOwnload" + masterIP + port);
 
         ManagedChannel channel = ManagedChannelBuilder.forAddress(masterIP, port).usePlaintext().build();
         ReplicationGrpc.ReplicationBlockingStub stub = ReplicationGrpc.newBlockingStub(channel);
 
         GetNodeForDownloadRequest.Builder builder = GetNodeForDownloadRequest.newBuilder();
         builder.setFilename(request.getFilename());
-
-        GetNodeForDownloadResponse response = stub.getNodeForDownload(builder.build());
-        String nodeIP = response.getNodeip();
+        GetNodeForDownloadResponse response;
+        String nodeIP = "";
+        try {
+            response = stub.getNodeForDownload(builder.build());
+             nodeIP = response.getNodeip();
+        }catch (Error e) {
+            System.out.println(e.toString());
+        }
 
         DownloadResponse.Builder clientResponseBuilder = DownloadResponse.newBuilder();
 
@@ -33,14 +35,12 @@ public class MasterComm {
         responseObserver.onNext(clientResponseBuilder.build());
         responseObserver.onCompleted();
 
+        channel.shutdown();
+
     }
 
     public static void getNodeForUpload(UploadRequest request,
-                                        StreamObserver<UploadResponse> responseObserver) {
-
-        String masterIP = "";
-        int port = 3000;
-
+                                        StreamObserver<UploadResponse> responseObserver, String masterIP, int port) {
         ManagedChannel channel = ManagedChannelBuilder.forAddress(masterIP, port).usePlaintext().build();
         ReplicationGrpc.ReplicationBlockingStub stub = ReplicationGrpc.newBlockingStub(channel);
 
@@ -53,17 +53,18 @@ public class MasterComm {
         UploadResponse.Builder clientResponseBuilder = UploadResponse.newBuilder();
 
         clientResponseBuilder.setNodeip(nodeIP);
+        clientResponseBuilder.setMessage("SUCCESS");
 
+        System.out.println("---------NODE IP" + nodeIP);
         responseObserver.onNext(clientResponseBuilder.build());
         responseObserver.onCompleted();
 
+        channel.shutdown();
+
     }
 
-    public static Status notifyMaster(String nodeIP) {
-
-        String masterIP = "";
-        int port = 3000;
-
+    public static Status notifyMaster(String nodeIP, String masterIP, int port) {
+        System.out.println("-------IN New Node Update");
         ManagedChannel channel = ManagedChannelBuilder.forAddress(masterIP, port).usePlaintext().build();
         ReplicationGrpc.ReplicationBlockingStub stub = ReplicationGrpc.newBlockingStub(channel);
 
@@ -72,6 +73,9 @@ public class MasterComm {
         builder.setNewnodeip(nodeIP);
 
         StatusResponse response = stub.newNodeUpdate(builder.build());
+        System.out.println("-------IN New Node Update" + response.getStatus());
+
+        channel.shutdown();
 
         return response.getStatus();
 
